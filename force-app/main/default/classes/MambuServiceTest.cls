@@ -95,4 +95,16 @@ private class MambuServiceTest {
         Case c = [SELECT Mambu_Transaction_Status__c FROM Case WHERE Id = :caseId];
         System.assertEquals('Rejected', c.Mambu_Transaction_Status__c);
     }
+
+    @isTest
+    static void testGetTransactionChannels() {
+        String mockResponse = '[{"encodedKey": "chan1", "name": "Cash"}]';
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator(200, mockResponse));
+        
+        Test.startTest();
+        String res = MambuController.getTransactionChannels();
+        Test.stopTest();
+        
+        System.assertEquals(mockResponse, res);
+    }
 }

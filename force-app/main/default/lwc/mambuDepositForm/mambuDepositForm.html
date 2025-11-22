@@ -7,6 +7,9 @@
                 onchange={handleAmountChange} required></lightning-input>
             <lightning-input type="date" label="Booking Date" value={bookingDate} onchange={handleDateChange}
                 required></lightning-input>
+            <lightning-combobox name="transactionChannel" label="Transaction Channel" value={selectedChannelId}
+                placeholder="Select Channel" options={transactionChannels} onchange={handleChannelChange} required>
+            </lightning-combobox>
             <lightning-textarea label="Notes" value={notes} onchange={handleNotesChange}></lightning-textarea>
 
             <div class="slds-m-top_large slds-align_absolute-center">

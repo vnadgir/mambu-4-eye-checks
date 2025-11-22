@@ -52,4 +52,24 @@ public with sharing class MambuService {
             throw new MambuException('Error making Deposit: ' + res.getStatus() + ' ' + res.getBody());
         }
     }
+
+    /**
+     * Fetches all transaction channels from Mambu.
+     * @return The response body containing the list of transaction channels.
+     */
+    public static String getTransactionChannels() {
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(NAMED_CREDENTIAL + '/organization/transactionchannels');
+        req.setMethod('GET');
+        req.setHeader('Accept', 'application/vnd.mambu.v2+json');
+
+        Http http = new Http();
+        HttpResponse res = http.send(req);
+
+        if (res.getStatusCode() >= 200 && res.getStatusCode() < 300) {
+            return res.getBody();
+        } else {
+            throw new MambuException('Error fetching Transaction Channels: ' + res.getStatus() + ' ' + res.getBody());
+        }
+    }
 }

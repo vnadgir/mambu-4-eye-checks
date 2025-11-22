@@ -112,4 +112,17 @@ public with sharing class MambuController {
             throw new AuraHandledException('Error rejecting transaction: ' + e.getMessage());
         }
     }
+
+    /**
+     * Fetches transaction channels for the UI.
+     * @return A JSON string of transaction channels.
+     */
+    @AuraEnabled(cacheable=true)
+    public static String getTransactionChannels() {
+        try {
+            return MambuService.getTransactionChannels();
+        } catch (Exception e) {
+            throw new AuraHandledException('Error fetching transaction channels: ' + e.getMessage());
+        }
+    }
 }
