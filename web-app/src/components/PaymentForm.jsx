@@ -1,33 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { getTransactionChannels, createTransaction } from '../services/mambuApi';
+import React, { useState } from 'react';
+import { createTransaction } from '../services/mambuApi';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { TRANSACTION_TYPES } from '../config/workflowConfig';
 
-const DepositForm = ({ user }) => {
-    const [channels, setChannels] = useState([]);
-    const [loadingChannels, setLoadingChannels] = useState(true);
+const PaymentForm = ({ user }) => {
     const [submitting, setSubmitting] = useState(false);
     const [notification, setNotification] = useState(null);
 
     const [formData, setFormData] = useState({
-        accountId: '',
+        beneficiaryName: '',
+        beneficiaryAccount: '',
         amount: '',
-        bookingDate: '',
-        transactionChannelId: '',
+        paymentDate: new Date().toISOString().split('T')[0],
+        paymentType: 'WIRE',
         notes: ''
     });
-
-    useEffect(() => {
-        getTransactionChannels()
-            .then(data => {
-                setChannels(data);
-                setLoadingChannels(false);
-            })
-            .catch(err => {
-                console.error('Failed to load channels', err);
-                setLoadingChannels(false);
-            });
-    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -40,18 +27,12 @@ const DepositForm = ({ user }) => {
         setNotification(null);
 
         try {
-            // Structure the data properly with nested transactionDetails
-            const depositData = {
-                accountId: formData.accountId,
-                amount: parseFloat(formData.amount),
-                bookingDate: formData.bookingDate,
-                notes: formData.notes,
-                transactionDetails: {
-                    transactionChannelId: formData.transactionChannelId
-                }
+            const paymentData = {
+                ...formData,
+                amount: parseFloat(formData.amount)
             };
 
-            const result = await createTransaction(TRANSACTION_TYPES.DEPOSIT, depositData, user);
+            const result = await createTransaction(TRANSACTION_TYPES.PAYMENT, paymentData, user);
 
             setNotification({
                 type: 'success',
@@ -61,26 +42,27 @@ const DepositForm = ({ user }) => {
 
             // Reset form
             setFormData({
-                accountId: '',
+                beneficiaryName: '',
+                beneficiaryAccount: '',
                 amount: '',
-                bookingDate: '',
-                transactionChannelId: '',
+                paymentDate: new Date().toISOString().split('T')[0],
+                paymentType: 'WIRE',
                 notes: ''
             });
         } catch (error) {
-            setNotification({ type: 'error', message: 'Failed to submit deposit.' });
+            setNotification({ type: 'error', message: 'Failed to submit payment.' });
         } finally {
             setSubmitting(false);
         }
     };
 
-    const isFormValid = formData.accountId && formData.amount && formData.bookingDate && formData.transactionChannelId;
+    const isFormValid = formData.beneficiaryName && formData.beneficiaryAccount && formData.amount && formData.paymentDate;
 
     return (
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-8 border border-slate-100">
             <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-800">New Mambu Deposit</h2>
-                <p className="text-slate-500 text-sm mt-1">Enter transaction details below.</p>
+                <h2 className="text-2xl font-bold text-slate-800">New Outgoing Payment</h2>
+                <p className="text-slate-500 text-sm mt-1">Initiate a payment to an external beneficiary.</p>
             </div>
 
             {notification && (
@@ -95,14 +77,27 @@ const DepositForm = ({ user }) => {
 
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Deposit Account ID</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Beneficiary Name</label>
                     <input
                         type="text"
-                        name="accountId"
-                        value={formData.accountId}
+                        name="beneficiaryName"
+                        value={formData.beneficiaryName}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="e.g. ABCD123"
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        placeholder="e.g. Vendor Corp Ltd."
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Beneficiary Account / IBAN</label>
+                    <input
+                        type="text"
+                        name="beneficiaryAccount"
+                        value={formData.beneficiaryAccount}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        placeholder="e.g. US123456789"
                         required
                     />
                 </div>
@@ -118,49 +113,38 @@ const DepositForm = ({ user }) => {
                                 value={formData.amount}
                                 onChange={handleChange}
                                 step="0.01"
-                                className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                                className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                                 placeholder="0.00"
                                 required
                             />
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Booking Date</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Payment Date</label>
                         <input
                             type="date"
-                            name="bookingDate"
-                            value={formData.bookingDate}
+                            name="paymentDate"
+                            value={formData.paymentDate}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                             required
                         />
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Transaction Channel</label>
-                    <div className="relative">
-                        <select
-                            name="transactionChannelId"
-                            value={formData.transactionChannelId}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all appearance-none bg-white"
-                            required
-                            disabled={loadingChannels}
-                        >
-                            <option value="">Select Channel</option>
-                            {channels.map(channel => (
-                                <option key={channel.encodedKey} value={channel.encodedKey}>
-                                    {channel.name}
-                                </option>
-                            ))}
-                        </select>
-                        {loadingChannels && (
-                            <div className="absolute right-3 top-2.5">
-                                <Loader2 className="animate-spin text-slate-400" size={16} />
-                            </div>
-                        )}
-                    </div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Payment Type</label>
+                    <select
+                        name="paymentType"
+                        value={formData.paymentType}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                    >
+                        <option value="WIRE">Wire Transfer</option>
+                        <option value="ACH">ACH</option>
+                        <option value="CHECK">Check</option>
+                        <option value="INTERNAL">Internal Transfer</option>
+                    </select>
                 </div>
 
                 <div>
@@ -170,8 +154,8 @@ const DepositForm = ({ user }) => {
                         value={formData.notes}
                         onChange={handleChange}
                         rows="3"
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
-                        placeholder="Optional notes..."
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+                        placeholder="Payment reference..."
                     ></textarea>
                 </div>
 
@@ -189,7 +173,7 @@ const DepositForm = ({ user }) => {
                             Submitting...
                         </>
                     ) : (
-                        'Submit for Approval'
+                        'Submit Payment'
                     )}
                 </button>
             </form>
@@ -197,4 +181,4 @@ const DepositForm = ({ user }) => {
     );
 };
 
-export default DepositForm;
+export default PaymentForm;

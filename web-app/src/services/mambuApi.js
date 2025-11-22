@@ -1,4 +1,5 @@
-import { saveTransaction, updateTransactionStatus } from './mockDatabase';
+import { saveTransaction, updateTransaction, getTransactionById } from './mockDatabase';
+import { processApproval } from './workflowEngine';
 
 // Mock data for Transaction Channels
 const MOCK_CHANNELS = [
@@ -16,39 +17,78 @@ export const getTransactionChannels = () => {
     });
 };
 
-export const createDeposit = (data) => {
+export const createTransaction = (transactionType, data, user) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            console.log('Submitting Deposit to DB:', data);
-            const txn = saveTransaction(data);
+            console.log('Submitting Transaction to DB:', transactionType, data);
+            const txn = saveTransaction(transactionType, data, user.email);
             resolve({
                 success: true,
-                caseId: txn.id,
-                message: 'Deposit submitted for approval.'
+                transactionId: txn.id,
+                message: 'Transaction submitted for approval.',
+                workflow: txn.workflowName
             });
         }, 800);
     });
 };
 
-export const approveDeposit = (id) => {
-    return new Promise((resolve) => {
+export const approveTransaction = (transactionId, user, comments = '') => {
+    return new Promise((resolve, reject) => {
         setTimeout(() => {
-            // Simulate calling real Mambu API here
-            console.log('Approving Transaction in Mambu:', id);
+            try {
+                console.log('Approving Transaction:', transactionId);
 
-            // Update DB status
-            updateTransactionStatus(id, 'APPROVED', { mambuId: 'MAMBU-' + Math.floor(Math.random() * 10000) });
+                const transaction = getTransactionById(transactionId);
+                if (!transaction) {
+                    reject(new Error('Transaction not found'));
+                    return;
+                }
 
-            resolve({ success: true });
+                // Process approval through workflow engine
+                const updatedTransaction = processApproval(transaction, user, 'APPROVE', comments);
+
+                // Update in database
+                updateTransaction(transactionId, updatedTransaction);
+
+                // If fully approved, simulate Mambu API call
+                if (updatedTransaction.status === 'APPROVED') {
+                    updatedTransaction.mambuResponse = {
+                        mambuId: 'MAMBU-' + Math.floor(Math.random() * 10000),
+                        processedAt: new Date().toISOString()
+                    };
+                    updateTransaction(transactionId, updatedTransaction);
+                }
+
+                resolve({
+                    success: true,
+                    status: updatedTransaction.status,
+                    message: updatedTransaction.status === 'APPROVED' ? 'Transaction fully approved and processed' : 'Approval recorded, awaiting additional approvals'
+                });
+            } catch (error) {
+                reject(error);
+            }
         }, 1000);
     });
 };
 
-export const rejectDeposit = (id) => {
-    return new Promise((resolve) => {
+export const rejectTransaction = (transactionId, user, comments = '') => {
+    return new Promise((resolve, reject) => {
         setTimeout(() => {
-            updateTransactionStatus(id, 'REJECTED');
-            resolve({ success: true });
+            try {
+                const transaction = getTransactionById(transactionId);
+                if (!transaction) {
+                    reject(new Error('Transaction not found'));
+                    return;
+                }
+
+                // Process rejection through workflow engine
+                const updatedTransaction = processApproval(transaction, user, 'REJECT', comments);
+                updateTransaction(transactionId, updatedTransaction);
+
+                resolve({ success: true, message: 'Transaction rejected' });
+            } catch (error) {
+                reject(error);
+            }
         }, 500);
     });
 };
