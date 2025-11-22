@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>MambuController</members>
+        <members>MambuService</members>
+        <members>MambuServiceTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>mambuDepositForm</members>
+        <members>mambuJournalEntryForm</members>
+        <members>mambuTransactionApprover</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
+        <members>Mambu_Finance</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Case.Mambu_Transaction_Type__c</members>
+        <members>Case.Mambu_Transaction_Data__c</members>
+        <members>Case.Mambu_Transaction_Status__c</members>
+        <members>Case.Mambu_Response__c</members>
+        <name>CustomField</name>
+    </types>
+    <version>60.0</version>
+</Package>
