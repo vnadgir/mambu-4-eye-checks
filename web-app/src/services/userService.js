@@ -67,6 +67,23 @@ export const MOCK_USERS = {
         roles: ['DEPOSIT_MAKER', 'DEPOSIT_CHECKER_L1', 'JOURNAL_MAKER']
     },
 
+    // Loan Department Users
+    'loan-officer@test.com': {
+        email: 'loan-officer@test.com',
+        username: 'Loan Officer',
+        roles: ['LOAN_OFFICER']
+    },
+    'loan-mgr@test.com': {
+        email: 'loan-mgr@test.com',
+        username: 'Loan Manager',
+        roles: ['LOAN_MANAGER']
+    },
+    'risk-mgr@test.com': {
+        email: 'risk-mgr@test.com',
+        username: 'Risk Manager',
+        roles: ['RISK_MANAGER']
+    },
+
     // Admin (basic auth)
     'admin': {
         email: 'admin@mambu.com',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, DollarSign, CreditCard } from 'lucide-react';
+import { FileText, DollarSign, CreditCard, Briefcase } from 'lucide-react';
 import { TRANSACTION_TYPES, workflowConfig } from '../config/workflowConfig';
 
 const TRANSACTION_ICONS = {
@@ -18,17 +18,23 @@ const TransactionTypeSelector = ({ availableTypes, onSelect, selectedType }) => 
                     const Icon = TRANSACTION_ICONS[type];
                     const isSelected = selectedType === type;
 
+                    // Ensure config and Icon exist for the type
+                    if (!config || !Icon) {
+                        console.warn(`Configuration or icon missing for transaction type: ${type} `);
+                        return null; // Skip rendering if config or icon is missing
+                    }
+
                     return (
                         <button
                             key={type}
                             onClick={() => onSelect(type)}
-                            className={`p-6 rounded-xl border-2 transition-all text-left ${isSelected
+                            className={`p - 6 rounded - xl border - 2 transition - all text - left ${isSelected
                                     ? 'border-indigo-500 bg-indigo-50 shadow-md'
                                     : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
-                                }`}
+                                } `}
                         >
-                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-3 ${isSelected ? 'bg-indigo-600' : 'bg-slate-100'
-                                }`}>
+                            <div className={`w - 12 h - 12 rounded - lg flex items - center justify - center mb - 3 ${isSelected ? 'bg-indigo-600' : 'bg-slate-100'
+                                } `}>
                                 <Icon className={isSelected ? 'text-white' : 'text-slate-600'} size={24} />
                             </div>
                             <h3 className="font-bold text-slate-900 mb-1">{config.name}</h3>

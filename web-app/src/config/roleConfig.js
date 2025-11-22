@@ -140,43 +140,78 @@ export const ROLES = {
         }
     },
 
+    // Loan Department
+    LOAN_OFFICER: {
+        name: 'Loan Officer',
+        department: DEPARTMENTS.LOANS,
+        seniority: SENIORITY_LEVELS.JUNIOR,
+        permissions: {
+            canCreate: ['LOAN_DISBURSEMENT'],
+            canApprove: [],
+            isAdmin: false
+        }
+    },
+    LOAN_MANAGER: {
+        name: 'Loan Manager',
+        department: DEPARTMENTS.LOANS,
+        seniority: SENIORITY_LEVELS.MANAGER,
+        permissions: {
+            canCreate: [],
+            canApprove: ['LOAN_DISBURSEMENT'],
+            isAdmin: false
+        }
+    },
+    RISK_MANAGER: {
+        name: 'Risk Manager',
+        department: DEPARTMENTS.RISK,
+        seniority: SENIORITY_LEVELS.MANAGER,
+        permissions: {
+            canCreate: [],
+            canApprove: ['LOAN_DISBURSEMENT'],
+            isAdmin: false
+        }
+    },
+
     // Senior Management
     SENIOR_MANAGER: {
         name: 'Senior Manager',
-        department: DEPARTMENTS.FINANCE,
-        seniority: SENIORITY_LEVELS.MANAGER,
+        department: DEPARTMENTS.MANAGEMENT,
+        seniority: SENIORITY_LEVELS.SENIOR,
         permissions: {
-            canCreate: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT'],
-            canApprove: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT']
+            canCreate: [],
+            canApprove: ['DEPOSIT'],
+            isAdmin: false
         }
     },
     FINANCE_DIRECTOR: {
         name: 'Finance Director',
-        department: DEPARTMENTS.FINANCE,
+        department: DEPARTMENTS.MANAGEMENT,
         seniority: SENIORITY_LEVELS.DIRECTOR,
         permissions: {
-            canCreate: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT'],
-            canApprove: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT']
+            canCreate: [],
+            canApprove: ['DEPOSIT', 'JOURNAL_ENTRY'],
+            isAdmin: false
         }
     },
     CFO: {
         name: 'Chief Financial Officer',
-        department: DEPARTMENTS.FINANCE,
+        department: DEPARTMENTS.MANAGEMENT,
         seniority: SENIORITY_LEVELS.EXECUTIVE,
         permissions: {
-            canCreate: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT'],
-            canApprove: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT']
+            canCreate: [],
+            canApprove: ['JOURNAL_ENTRY', 'PAYMENT'],
+            isAdmin: true
         }
     },
 
     // Admin
     ADMIN: {
         name: 'System Administrator',
-        department: DEPARTMENTS.FINANCE,
+        department: DEPARTMENTS.IT,
         seniority: SENIORITY_LEVELS.EXECUTIVE,
         permissions: {
-            canCreate: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT'],
-            canApprove: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT'],
+            canCreate: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT', 'LOAN_DISBURSEMENT'],
+            canApprove: ['DEPOSIT', 'JOURNAL_ENTRY', 'PAYMENT', 'LOAN_DISBURSEMENT'],
             isAdmin: true
         }
     }

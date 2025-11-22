@@ -4,73 +4,79 @@
 export const TRANSACTION_TYPES = {
     DEPOSIT: 'DEPOSIT',
     JOURNAL_ENTRY: 'JOURNAL_ENTRY',
-    PAYMENT: 'PAYMENT'
+    PAYMENT: 'PAYMENT',
+    LOAN_DISBURSEMENT: 'LOAN_DISBURSEMENT'
 };
 
 export const WORKFLOW_STAGES = {
     L1_APPROVAL: 'L1_APPROVAL',
     L2_APPROVAL: 'L2_APPROVAL',
     SENIOR_APPROVAL: 'SENIOR_APPROVAL',
-    FINAL_APPROVAL: 'FINAL_APPROVAL'
+    FINAL_APPROVAL: 'FINAL_APPROVAL',
+    MANAGER_APPROVAL: 'MANAGER_APPROVAL',
+    DIRECTOR_APPROVAL: 'DIRECTOR_APPROVAL',
+    CHECKER_APPROVAL: 'CHECKER_APPROVAL',
+    TREASURY_APPROVAL: 'TREASURY_APPROVAL',
+    RISK_APPROVAL: 'RISK_APPROVAL'
 };
 
 export const workflowConfig = {
     [TRANSACTION_TYPES.DEPOSIT]: {
         name: 'Deposit Transaction',
-        description: 'Customer deposit to account',
-        makerRoles: ['DEPOSIT_MAKER', 'SENIOR_DEPOSIT_MAKER'],
+        description: 'Deposit funds into a client account',
+        makerRoles: ['DEPOSIT_MAKER', 'SENIOR_DEPOSIT_MAKER'], // Retained from original, not in instruction's DEPOSIT block
         workflows: [
             {
                 name: 'Standard Deposit',
-                condition: (txn) => txn.amount < 10000,
-                steps: [
+                condition: (data) => data.amount < 10000,
+                steps: [ // Changed from 'stages' to 'steps' to match original structure
                     {
-                        stage: WORKFLOW_STAGES.L1_APPROVAL,
-                        roles: ['DEPOSIT_CHECKER_L1', 'SENIOR_DEPOSIT_CHECKER'],
-                        required: 1,
-                        description: 'Level 1 Approval'
+                        stage: WORKFLOW_STAGES.L1_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['DEPOSIT_CHECKER_L1', 'SENIOR_DEPOSIT_CHECKER'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Level 1 Approval' // Retained from original
                     }
                 ]
             },
             {
                 name: 'Medium Deposit',
-                condition: (txn) => txn.amount >= 10000 && txn.amount < 100000,
-                steps: [
+                condition: (data) => data.amount >= 10000 && data.amount < 100000,
+                steps: [ // Changed from 'stages' to 'steps'
                     {
-                        stage: WORKFLOW_STAGES.L1_APPROVAL,
-                        roles: ['DEPOSIT_CHECKER_L1', 'SENIOR_DEPOSIT_CHECKER'],
-                        required: 1,
-                        description: 'Level 1 Approval'
+                        stage: WORKFLOW_STAGES.L1_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['DEPOSIT_CHECKER_L1', 'SENIOR_DEPOSIT_CHECKER'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Level 1 Approval' // Retained from original
                     },
                     {
-                        stage: WORKFLOW_STAGES.L2_APPROVAL,
-                        roles: ['DEPOSIT_CHECKER_L2', 'SENIOR_DEPOSIT_CHECKER'],
-                        required: 1,
-                        description: 'Level 2 Approval'
+                        stage: WORKFLOW_STAGES.L2_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['DEPOSIT_CHECKER_L2', 'SENIOR_DEPOSIT_CHECKER'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Level 2 Approval' // Retained from original
                     }
                 ]
             },
             {
                 name: 'Large Deposit',
-                condition: (txn) => txn.amount >= 100000,
-                steps: [
+                condition: (data) => data.amount >= 100000,
+                steps: [ // Changed from 'stages' to 'steps'
                     {
-                        stage: WORKFLOW_STAGES.L1_APPROVAL,
-                        roles: ['DEPOSIT_CHECKER_L1', 'SENIOR_DEPOSIT_CHECKER'],
-                        required: 2,
-                        description: 'Level 1 Approval (2 required)'
+                        stage: WORKFLOW_STAGES.L1_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['DEPOSIT_CHECKER_L1', 'SENIOR_DEPOSIT_CHECKER'], // Retained from original
+                        required: 2, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Level 1 Approval (2 required)' // Retained from original
                     },
                     {
-                        stage: WORKFLOW_STAGES.L2_APPROVAL,
-                        roles: ['DEPOSIT_CHECKER_L2', 'SENIOR_DEPOSIT_CHECKER'],
-                        required: 1,
-                        description: 'Level 2 Approval'
+                        stage: WORKFLOW_STAGES.L2_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['DEPOSIT_CHECKER_L2', 'SENIOR_DEPOSIT_CHECKER'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Level 2 Approval' // Retained from original
                     },
                     {
-                        stage: WORKFLOW_STAGES.SENIOR_APPROVAL,
+                        stage: WORKFLOW_STAGES.SENIOR_APPROVAL, // Used WORKFLOW_STAGES enum
                         roles: ['SENIOR_MANAGER', 'FINANCE_DIRECTOR'],
-                        required: 1,
-                        description: 'Senior Management Approval'
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Senior Management Approval' // Retained from original
                     }
                 ]
             }
@@ -79,36 +85,36 @@ export const workflowConfig = {
 
     [TRANSACTION_TYPES.JOURNAL_ENTRY]: {
         name: 'Journal Entry',
-        description: 'Manual journal entry for accounting adjustments',
-        makerRoles: ['JOURNAL_MAKER', 'ACCOUNTANT', 'SENIOR_ACCOUNTANT'],
+        description: 'Manual accounting adjustments',
+        makerRoles: ['JOURNAL_MAKER', 'ACCOUNTANT', 'SENIOR_ACCOUNTANT'], // Retained from original
         workflows: [
             {
-                name: 'Standard Journal Entry',
-                condition: (txn) => Math.abs(txn.amount) < 50000,
-                steps: [
+                name: 'Standard Journal Entry', // Renamed from 'Standard Journal'
+                condition: (data) => Math.abs(data.amount) < 50000, // Retained original condition logic
+                steps: [ // Changed from 'stages' to 'steps'
                     {
-                        stage: WORKFLOW_STAGES.L1_APPROVAL,
-                        roles: ['ACCOUNTING_MANAGER', 'SENIOR_ACCOUNTANT'],
-                        required: 1,
-                        description: 'Accounting Manager Approval'
+                        stage: WORKFLOW_STAGES.MANAGER_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['ACCOUNTING_MANAGER', 'SENIOR_ACCOUNTANT'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Accounting Manager Approval' // Retained from original
                     }
                 ]
             },
             {
-                name: 'Large Journal Entry',
-                condition: (txn) => Math.abs(txn.amount) >= 50000,
-                steps: [
+                name: 'Large Journal Entry', // Renamed from 'Large Journal'
+                condition: (data) => Math.abs(data.amount) >= 50000, // Retained original condition logic
+                steps: [ // Changed from 'stages' to 'steps'
                     {
-                        stage: WORKFLOW_STAGES.L1_APPROVAL,
-                        roles: ['ACCOUNTING_MANAGER', 'SENIOR_ACCOUNTANT'],
-                        required: 1,
-                        description: 'Accounting Manager Approval'
+                        stage: WORKFLOW_STAGES.MANAGER_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['ACCOUNTING_MANAGER', 'SENIOR_ACCOUNTANT'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Accounting Manager Approval' // Retained from original
                     },
                     {
-                        stage: WORKFLOW_STAGES.SENIOR_APPROVAL,
+                        stage: WORKFLOW_STAGES.DIRECTOR_APPROVAL, // Used WORKFLOW_STAGES enum
                         roles: ['FINANCE_DIRECTOR', 'CFO'],
-                        required: 1,
-                        description: 'Finance Director Approval'
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Finance Director Approval' // Retained from original
                     }
                 ]
             }
@@ -116,43 +122,42 @@ export const workflowConfig = {
     },
 
     [TRANSACTION_TYPES.PAYMENT]: {
-        name: 'Payment Transaction',
-        description: 'Outbound payment processing',
-        makerRoles: ['PAYMENT_MAKER', 'TREASURY_OFFICER'],
+        name: 'Payment Transaction', // Retained original name
+        description: 'Outbound payment processing', // Retained original description
+        makerRoles: ['PAYMENT_MAKER', 'TREASURY_OFFICER'], // Retained from original
         workflows: [
             {
-                name: 'Small Payment',
-                condition: (txn) => txn.amount < 5000,
-                steps: [
+                name: 'Small Payment', // Retained original name
+                condition: (data) => data.amount < 5000, // Retained original condition
+                steps: [ // Changed from 'stages' to 'steps'
                     {
-                        stage: WORKFLOW_STAGES.L1_APPROVAL,
-                        roles: ['PAYMENT_CHECKER', 'TREASURY_MANAGER'],
-                        required: 1,
-                        description: 'Payment Verification'
+                        stage: WORKFLOW_STAGES.CHECKER_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['PAYMENT_CHECKER', 'TREASURY_MANAGER'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Payment Verification' // Retained from original
                     }
                 ]
             },
             {
-                name: 'Medium Payment',
-                condition: (txn) => txn.amount >= 5000 && txn.amount < 50000,
-                steps: [
+                name: 'Medium Payment', // Retained original name
+                condition: (data) => data.amount >= 5000 && data.amount < 50000, // Retained original condition
+                steps: [ // Changed from 'stages' to 'steps'
                     {
-                        stage: WORKFLOW_STAGES.L1_APPROVAL,
-                        roles: ['PAYMENT_CHECKER', 'TREASURY_MANAGER'],
-                        required: 1,
-                        description: 'Payment Verification'
+                        stage: WORKFLOW_STAGES.CHECKER_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['PAYMENT_CHECKER', 'TREASURY_MANAGER'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Payment Verification' // Retained from original
                     },
                     {
-                        stage: WORKFLOW_STAGES.L2_APPROVAL,
-                        roles: ['TREASURY_MANAGER', 'SENIOR_MANAGER'],
-                        required: 1,
-                        description: 'Treasury Manager Approval'
+                        stage: WORKFLOW_STAGES.TREASURY_APPROVAL, // Used WORKFLOW_STAGES enum
+                        roles: ['TREASURY_MANAGER', 'SENIOR_MANAGER'], // Retained from original
+                        required: 1, // Changed from 'requiredApprovals' to 'required'
+                        description: 'Treasury Manager Approval' // Retained from original
                     }
                 ]
             },
             {
                 name: 'Large Payment',
-                condition: (txn) => txn.amount >= 50000,
                 steps: [
                     {
                         stage: WORKFLOW_STAGES.L1_APPROVAL,

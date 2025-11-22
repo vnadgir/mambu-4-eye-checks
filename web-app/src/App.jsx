@@ -3,6 +3,7 @@ import Login from './components/Login';
 import DepositForm from './components/DepositForm';
 import JournalEntryForm from './components/JournalEntryForm';
 import PaymentForm from './components/PaymentForm';
+import LoanDisbursementForm from './components/LoanDisbursementForm';
 import ApprovalDashboard from './components/ApprovalDashboard';
 import TransactionTypeSelector from './components/TransactionTypeSelector';
 import { LogOut, Shield, User, LayoutDashboard, PlusCircle } from 'lucide-react';
@@ -20,7 +21,8 @@ function App() {
     const canCreate = getAvailableTransactionTypes(loggedInUser).length > 0;
     const canApprove = canApproveTransactionType(loggedInUser, 'DEPOSIT') ||
       canApproveTransactionType(loggedInUser, 'JOURNAL_ENTRY') ||
-      canApproveTransactionType(loggedInUser, 'PAYMENT');
+      canApproveTransactionType(loggedInUser, 'PAYMENT') ||
+      canApproveTransactionType(loggedInUser, 'LOAN_DISBURSEMENT');
 
     if (canApprove) {
       setView('approval');
@@ -44,7 +46,8 @@ function App() {
   const availableTypes = getAvailableTransactionTypes(user);
   const canApprove = canApproveTransactionType(user, 'DEPOSIT') ||
     canApproveTransactionType(user, 'JOURNAL_ENTRY') ||
-    canApproveTransactionType(user, 'PAYMENT');
+    canApproveTransactionType(user, 'PAYMENT') ||
+    canApproveTransactionType(user, 'LOAN_DISBURSEMENT');
 
   // Get user role display names
   const roleNames = user.roles.map(r => ROLES[r]?.name).join(', ');
@@ -138,7 +141,11 @@ function App() {
                   <PaymentForm user={user} />
                 )}
 
-                {selectedTransactionType !== 'DEPOSIT' && selectedTransactionType !== 'JOURNAL_ENTRY' && selectedTransactionType !== 'PAYMENT' && (
+                {selectedTransactionType === 'LOAN_DISBURSEMENT' && (
+                  <LoanDisbursementForm user={user} />
+                )}
+
+                {selectedTransactionType !== 'DEPOSIT' && selectedTransactionType !== 'JOURNAL_ENTRY' && selectedTransactionType !== 'PAYMENT' && selectedTransactionType !== 'LOAN_DISBURSEMENT' && (
                   <div className="bg-white p-12 rounded-xl shadow-sm border border-slate-200 text-center">
                     <h3 className="text-lg font-medium text-slate-800">Coming Soon</h3>
                     <p className="text-slate-500 mt-2">The form for {selectedTransactionType} is under construction.</p>

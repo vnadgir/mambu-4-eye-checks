@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { getPendingTransactionsForUser } from '../services/mockDatabase';
 import { approveTransaction, rejectTransaction } from '../services/mambuApi';
-import { CheckCircle, XCircle, Clock, Loader2, FileText, DollarSign, CreditCard, ChevronRight } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Loader2, FileText, DollarSign, CreditCard, ChevronRight, Briefcase } from 'lucide-react';
 import { getCurrentStage, getWorkflowProgress } from '../services/workflowEngine';
 import WorkflowVisualization from './WorkflowVisualization';
 
 const TRANSACTION_ICONS = {
     DEPOSIT: DollarSign,
     JOURNAL_ENTRY: FileText,
-    PAYMENT: CreditCard
+    PAYMENT: CreditCard,
+    LOAN_DISBURSEMENT: Briefcase
 };
 
 const ApprovalDashboard = ({ user }) => {
