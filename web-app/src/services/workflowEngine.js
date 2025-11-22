@@ -83,6 +83,7 @@ export const canUserApprove = (user, transaction) => {
     }
 
     // Check if user created the transaction (maker can't approve own transaction)
+    // CRITICAL: Segregation of Duties (SoD) check
     if (transaction.createdBy === user.email) {
         return false;
     }

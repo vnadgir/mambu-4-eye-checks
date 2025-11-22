@@ -1,5 +1,6 @@
 import { saveTransaction, updateTransaction, getTransactionById } from './mockDatabase';
 import { processApproval } from './workflowEngine';
+import { sessionService } from './sessionService';
 
 // Mock data for Transaction Channels
 const MOCK_CHANNELS = [
@@ -17,8 +18,14 @@ export const getTransactionChannels = () => {
     });
 };
 
-export const createTransaction = (transactionType, data, user) => {
-    return new Promise((resolve) => {
+export const createTransaction = (transactionType, data) => {
+    return new Promise((resolve, reject) => {
+        const user = sessionService.getCurrentUser();
+        if (!user) {
+            reject(new Error('Unauthorized: No active session'));
+            return;
+        }
+
         setTimeout(() => {
             // console.log('Submitting Transaction to DB:', transactionType, data); // Removed for security
             const txn = saveTransaction(transactionType, data, user.email);
@@ -32,8 +39,14 @@ export const createTransaction = (transactionType, data, user) => {
     });
 };
 
-export const approveTransaction = (transactionId, user, comments = '') => {
+export const approveTransaction = (transactionId, comments = '') => {
     return new Promise((resolve, reject) => {
+        const user = sessionService.getCurrentUser();
+        if (!user) {
+            reject(new Error('Unauthorized: No active session'));
+            return;
+        }
+
         setTimeout(() => {
             try {
                 // console.log('Approving Transaction:', transactionId); // Removed for security
@@ -71,8 +84,14 @@ export const approveTransaction = (transactionId, user, comments = '') => {
     });
 };
 
-export const rejectTransaction = (transactionId, user, comments = '') => {
+export const rejectTransaction = (transactionId, comments = '') => {
     return new Promise((resolve, reject) => {
+        const user = sessionService.getCurrentUser();
+        if (!user) {
+            reject(new Error('Unauthorized: No active session'));
+            return;
+        }
+
         setTimeout(() => {
             try {
                 const transaction = getTransactionById(transactionId);

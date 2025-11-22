@@ -10,19 +10,21 @@ import { LogOut, Shield, User, LayoutDashboard, PlusCircle } from 'lucide-react'
 import { getAvailableTransactionTypes, canApproveTransactionType, getUserSeniorityLevel, isAdmin } from './services/permissionService';
 import { ROLES } from './config/roleConfig';
 
+import { sessionService } from './services/sessionService';
+
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(sessionService.getCurrentUser());
   const [view, setView] = useState('dashboard'); // 'dashboard', 'create', 'approval'
   const [selectedTransactionType, setSelectedTransactionType] = useState(null);
 
   const handleLogin = (loggedInUser) => {
+    sessionService.login(loggedInUser);
     setUser(loggedInUser);
     // Determine initial view based on roles
     const canCreate = getAvailableTransactionTypes(loggedInUser).length > 0;
     const canApprove = canApproveTransactionType(loggedInUser, 'DEPOSIT') ||
       canApproveTransactionType(loggedInUser, 'JOURNAL_ENTRY') ||
-      canApproveTransactionType(loggedInUser, 'PAYMENT') ||
-      canApproveTransactionType(loggedInUser, 'LOAN_DISBURSEMENT');
+      canApproveTransactionType(loggedInUser, 'PAYMENT');
 
     if (canApprove) {
       setView('approval');
@@ -34,6 +36,7 @@ function App() {
   };
 
   const handleLogout = () => {
+    sessionService.logout();
     setUser(null);
     setView('dashboard');
     setSelectedTransactionType(null);

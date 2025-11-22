@@ -51,7 +51,7 @@ const DepositForm = ({ user }) => {
                 }
             };
 
-            const result = await createTransaction(TRANSACTION_TYPES.DEPOSIT, depositData, user);
+            const result = await createTransaction(TRANSACTION_TYPES.DEPOSIT, depositData);
 
             setNotification({
                 type: 'success',

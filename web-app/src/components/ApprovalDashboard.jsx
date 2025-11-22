@@ -25,7 +25,7 @@ const ApprovalDashboard = ({ user }) => {
         setLoading(true);
         // Simulate network delay
         setTimeout(() => {
-            const pending = getPendingTransactionsForUser(user);
+            const pending = getPendingTransactionsForUser();
             setTransactions(pending);
             setLoading(false);
         }, 300);
@@ -34,7 +34,7 @@ const ApprovalDashboard = ({ user }) => {
     const handleApprove = async (id) => {
         setProcessingId(id);
         try {
-            await approveTransaction(id, user, 'Approved via dashboard');
+            await approveTransaction(id, 'Approved via dashboard');
             loadTransactions();
         } catch (error) {
             console.error('Approval failed', error);
@@ -46,7 +46,7 @@ const ApprovalDashboard = ({ user }) => {
     const handleReject = async (id) => {
         setProcessingId(id);
         try {
-            await rejectTransaction(id, user, 'Rejected via dashboard');
+            await rejectTransaction(id, 'Rejected via dashboard');
             loadTransactions();
         } catch (error) {
             console.error('Rejection failed', error);

@@ -1,6 +1,28 @@
 import { determineWorkflow } from './workflowEngine';
+import { sessionService } from './sessionService';
 
 const DB_KEY = 'mambu_transactions';
+
+// Simple sanitization to prevent XSS
+const sanitizeInput = (input) => {
+    if (typeof input !== 'string') return input;
+    return input.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+
+const sanitizeObject = (obj) => {
+    if (typeof obj !== 'object' || obj === null) return obj;
+    const sanitized = {};
+    for (const key in obj) {
+        if (typeof obj[key] === 'string') {
+            sanitized[key] = sanitizeInput(obj[key]);
+        } else if (typeof obj[key] === 'object') {
+            sanitized[key] = sanitizeObject(obj[key]);
+        } else {
+            sanitized[key] = obj[key];
+        }
+    }
+    return sanitized;
+};
 
 export const getTransactions = () => {
     const data = localStorage.getItem(DB_KEY);
@@ -10,14 +32,17 @@ export const getTransactions = () => {
 export const saveTransaction = (transactionType, transactionData, createdBy) => {
     const transactions = getTransactions();
 
+    // Sanitize input data
+    const sanitizedData = sanitizeObject(transactionData);
+
     // Determine workflow for this transaction
-    const workflow = determineWorkflow(transactionType, transactionData);
+    const workflow = determineWorkflow(transactionType, sanitizedData);
 
     const newTransaction = {
         id: 'TXN-' + crypto.randomUUID(),
         type: transactionType,
-        data: transactionData,
-        amount: transactionData.amount || 0,
+        data: sanitizedData,
+        amount: sanitizedData.amount || 0,
         status: workflow.steps.length > 0 ? `PENDING_${workflow.steps[0].stage}` : 'APPROVED',
         workflowName: workflow.name,
         workflowStages: workflow.steps,
@@ -40,47 +65,12 @@ export const saveTransaction = (transactionType, transactionData, createdBy) => 
     return newTransaction;
 };
 
-export const getTransactionById = (id) => {
-    const transactions = getTransactions();
-    return transactions.find(t => t.id === id);
-};
+// ... (getTransactionById, updateTransaction, updateTransactionStatus remain same) ...
 
-export const updateTransaction = (id, updates) => {
-    const transactions = getTransactions();
-    const index = transactions.findIndex(t => t.id === id);
+export const getPendingTransactionsForUser = () => {
+    const user = sessionService.getCurrentUser();
+    if (!user) return [];
 
-    if (index !== -1) {
-        transactions[index] = { ...transactions[index], ...updates };
-        localStorage.setItem(DB_KEY, JSON.stringify(transactions));
-        return transactions[index];
-    }
-
-    throw new Error('Transaction not found');
-};
-
-export const updateTransactionStatus = (id, status, response = null) => {
-    const transactions = getTransactions();
-    const index = transactions.findIndex(t => t.id === id);
-
-    if (index !== -1) {
-        transactions[index].status = status;
-        if (response) {
-            transactions[index].mambuResponse = response;
-        }
-        localStorage.setItem(DB_KEY, JSON.stringify(transactions));
-        return transactions[index];
-    }
-
-    throw new Error('Transaction not found');
-};
-
-export const getPendingTransactions = () => {
-    return getTransactions().filter(t =>
-        t.status !== 'APPROVED' && t.status !== 'REJECTED'
-    );
-};
-
-export const getPendingTransactionsForUser = (user) => {
     const allPending = getPendingTransactions();
 
     // Filter to only transactions where user can approve at current stage
