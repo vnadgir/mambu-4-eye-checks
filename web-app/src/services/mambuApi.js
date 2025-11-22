@@ -20,7 +20,7 @@ export const getTransactionChannels = () => {
 export const createTransaction = (transactionType, data, user) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            console.log('Submitting Transaction to DB:', transactionType, data);
+            // console.log('Submitting Transaction to DB:', transactionType, data); // Removed for security
             const txn = saveTransaction(transactionType, data, user.email);
             resolve({
                 success: true,
@@ -36,7 +36,7 @@ export const approveTransaction = (transactionId, user, comments = '') => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             try {
-                console.log('Approving Transaction:', transactionId);
+                // console.log('Approving Transaction:', transactionId); // Removed for security
 
                 const transaction = getTransactionById(transactionId);
                 if (!transaction) {
@@ -53,7 +53,7 @@ export const approveTransaction = (transactionId, user, comments = '') => {
                 // If fully approved, simulate Mambu API call
                 if (updatedTransaction.status === 'APPROVED') {
                     updatedTransaction.mambuResponse = {
-                        mambuId: 'MAMBU-' + Math.floor(Math.random() * 10000),
+                        mambuId: 'MAMBU-' + crypto.randomUUID(),
                         processedAt: new Date().toISOString()
                     };
                     updateTransaction(transactionId, updatedTransaction);

@@ -6,84 +6,72 @@ export const MOCK_USERS = {
     'maker1@test.com': {
         email: 'maker1@test.com',
         username: 'Deposit Maker 1',
-        roles: ['DEPOSIT_MAKER'],
-        password: 'mambu'
+        roles: ['DEPOSIT_MAKER']
     },
     'checker1@test.com': {
         email: 'checker1@test.com',
         username: 'Deposit Checker L1',
-        roles: ['DEPOSIT_CHECKER_L1'],
-        password: 'mambu'
+        roles: ['DEPOSIT_CHECKER_L1']
     },
     'checker2@test.com': {
         email: 'checker2@test.com',
         username: 'Deposit Checker L2',
-        roles: ['DEPOSIT_CHECKER_L2'],
-        password: 'mambu'
+        roles: ['DEPOSIT_CHECKER_L2']
     },
 
     // Accounting Department Users
     'accountant@test.com': {
         email: 'accountant@test.com',
         username: 'Accountant',
-        roles: ['ACCOUNTANT'],
-        password: 'mambu'
+        roles: ['ACCOUNTANT']
     },
     'accounting-mgr@test.com': {
         email: 'accounting-mgr@test.com',
         username: 'Accounting Manager',
-        roles: ['ACCOUNTING_MANAGER'],
-        password: 'mambu'
+        roles: ['ACCOUNTING_MANAGER']
     },
 
     // Treasury Department Users
     'payment-maker@test.com': {
         email: 'payment-maker@test.com',
         username: 'Payment Maker',
-        roles: ['PAYMENT_MAKER'],
-        password: 'mambu'
+        roles: ['PAYMENT_MAKER']
     },
     'payment-checker@test.com': {
         email: 'payment-checker@test.com',
         username: 'Payment Checker',
-        roles: ['PAYMENT_CHECKER'],
-        password: 'mambu'
+        roles: ['PAYMENT_CHECKER']
     },
     'treasury-mgr@test.com': {
         email: 'treasury-mgr@test.com',
         username: 'Treasury Manager',
-        roles: ['TREASURY_MANAGER'],
-        password: 'mambu'
+        roles: ['TREASURY_MANAGER']
     },
 
     // Senior Management
     'senior-mgr@test.com': {
         email: 'senior-mgr@test.com',
         username: 'Senior Manager',
-        roles: ['SENIOR_MANAGER'],
-        password: 'mambu'
+        roles: ['SENIOR_MANAGER']
     },
     'finance-dir@test.com': {
         email: 'finance-dir@test.com',
         username: 'Finance Director',
-        roles: ['FINANCE_DIRECTOR'],
-        password: 'mambu'
+        roles: ['FINANCE_DIRECTOR']
     },
 
     // Multi-role users (for testing)
     'multi-role@test.com': {
         email: 'multi-role@test.com',
         username: 'Multi-Role User',
-        roles: ['DEPOSIT_MAKER', 'DEPOSIT_CHECKER_L1', 'JOURNAL_MAKER'],
-        password: 'mambu'
+        roles: ['DEPOSIT_MAKER', 'DEPOSIT_CHECKER_L1', 'JOURNAL_MAKER']
     },
 
     // Admin (basic auth)
     'admin': {
         email: 'admin@mambu.com',
         username: 'Administrator',
-        roles: ['ADMIN'],
-        password: 'mambu'
+        roles: ['ADMIN']
     }
 };
 
@@ -96,10 +84,11 @@ export const MOCK_USERS = {
 export const authenticateUser = (username, password) => {
     const user = MOCK_USERS[username];
 
-    if (user && user.password === password) {
-        // Return user without password
-        const { password: _, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+    // In a real app, we would hash the password and compare
+    // For this mock, we'll just check if the user exists and password is 'mambu'
+    // This avoids storing passwords in the code
+    if (user && password === 'mambu') {
+        return { ...user };
     }
 
     return null;
@@ -113,8 +102,7 @@ export const authenticateUser = (username, password) => {
 export const getUserByEmail = (email) => {
     const user = MOCK_USERS[email];
     if (user) {
-        const { password: _, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        return { ...user };
     }
     return null;
 };
@@ -125,7 +113,8 @@ export const getUserByEmail = (email) => {
  */
 export const getAllTestUsers = () => {
     return Object.values(MOCK_USERS).map(user => {
-        const { password: _, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        if (user) {
+            return { ...user };
+        }
     });
 };

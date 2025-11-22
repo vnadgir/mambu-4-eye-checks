@@ -14,7 +14,7 @@ export const saveTransaction = (transactionType, transactionData, createdBy) => 
     const workflow = determineWorkflow(transactionType, transactionData);
 
     const newTransaction = {
-        id: 'TXN-' + Date.now(),
+        id: 'TXN-' + crypto.randomUUID(),
         type: transactionType,
         data: transactionData,
         amount: transactionData.amount || 0,
