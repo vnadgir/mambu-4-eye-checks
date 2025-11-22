@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DepositForm from './components/DepositForm';
-import { LayoutDashboard } from 'lucide-react';
+import Login from './components/Login';
+import ApprovalDashboard from './components/ApprovalDashboard';
+import { LayoutDashboard, LogOut, User } from 'lucide-react';
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  if (!user) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
@@ -15,10 +31,17 @@ function App() {
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">Mambu Operations</h1>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-sm text-slate-500">
-              <span className="w-2 h-2 bg-green-500 rounded-full inline-block mr-2"></span>
-              System Operational
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-full border border-slate-200">
+              <User size={16} className="text-slate-500" />
+              <span className="text-sm font-medium text-slate-700 capitalize">{user.username} ({user.role})</span>
             </div>
+            <button
+              onClick={handleLogout}
+              className="text-slate-500 hover:text-red-600 transition-colors p-2 rounded-full hover:bg-red-50"
+              title="Logout"
+            >
+              <LogOut size={20} />
+            </button>
           </div>
         </div>
       </header>
@@ -26,7 +49,11 @@ function App() {
       {/* Main Content */}
       <main className="flex-grow py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <DepositForm />
+          {user.role === 'MAKER' ? (
+            <DepositForm />
+          ) : (
+            <ApprovalDashboard />
+          )}
         </div>
       </main>
 
