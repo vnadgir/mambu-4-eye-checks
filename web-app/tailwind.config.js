@@ -5,7 +5,12 @@ export default {
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                'mambu-green': '#4FB645',
+                'mambu-dark': '#212121',
+            }
+        },
     },
     plugins: [],
 }

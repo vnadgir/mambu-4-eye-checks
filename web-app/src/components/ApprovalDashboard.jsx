@@ -59,24 +59,24 @@ const ApprovalDashboard = ({ user }) => {
         <div className="max-w-4xl mx-auto">
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-800">Pending Approvals</h2>
+                    <h2 className="text-2xl font-bold text-mambu-dark">Pending Approvals</h2>
                     <p className="text-slate-500 text-sm mt-1">Review and action requests assigned to your role.</p>
                 </div>
-                <button onClick={loadTransactions} className="text-indigo-600 text-sm font-medium hover:underline">
+                <button onClick={loadTransactions} className="text-mambu-green text-sm font-medium hover:underline">
                     Refresh List
                 </button>
             </div>
 
             {loading ? (
                 <div className="flex justify-center py-12">
-                    <Loader2 className="animate-spin text-indigo-600" size={32} />
+                    <Loader2 className="animate-spin text-mambu-green" size={32} />
                 </div>
             ) : transactions.length === 0 ? (
                 <div className="bg-white p-12 rounded-xl shadow-sm border border-slate-200 text-center">
                     <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CheckCircle className="text-green-500" size={32} />
+                        <CheckCircle className="text-mambu-green" size={32} />
                     </div>
-                    <h3 className="text-lg font-medium text-slate-800">All Caught Up!</h3>
+                    <h3 className="text-lg font-medium text-mambu-dark">All Caught Up!</h3>
                     <p className="text-slate-500 mt-2">No pending transactions require your approval.</p>
                 </div>
             ) : (
@@ -90,7 +90,7 @@ const ApprovalDashboard = ({ user }) => {
                             <div key={txn.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex-grow">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                                        <span className="bg-green-50 text-mambu-green text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
                                             <Icon size={12} /> {txn.type.replace('_', ' ')}
                                         </span>
                                         <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
@@ -100,7 +100,7 @@ const ApprovalDashboard = ({ user }) => {
                                     </div>
 
                                     <div className="flex items-baseline gap-2">
-                                        <h3 className="text-xl font-bold text-slate-900">
+                                        <h3 className="text-xl font-bold text-mambu-dark">
                                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(txn.amount)}
                                         </h3>
                                         <span className="text-slate-500 text-sm">
@@ -135,7 +135,7 @@ const ApprovalDashboard = ({ user }) => {
                                     <button
                                         onClick={() => handleApprove(txn.id)}
                                         disabled={processingId === txn.id}
-                                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+                                        className="px-4 py-2 bg-mambu-green text-white rounded-lg hover:opacity-90 font-medium transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
                                     >
                                         {processingId === txn.id ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={18} />}
                                         Approve

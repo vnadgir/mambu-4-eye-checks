@@ -61,15 +61,15 @@ function App() {
   const roleNames = user.roles.map(r => ROLES[r]?.name).join(', ');
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 font-sans text-mambu-dark">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-2 rounded-lg">
+            <div className="bg-mambu-green p-2 rounded-lg">
               <Shield className="text-white" size={20} />
             </div>
-            <span className="font-bold text-xl tracking-tight text-slate-800">Mambu<span className="text-indigo-600">Ops</span></span>
+            <span className="font-bold text-xl tracking-tight text-mambu-dark">Mambu<span className="text-mambu-green">Ops</span></span>
           </div>
 
           <div className="flex items-center gap-6">
@@ -78,7 +78,7 @@ function App() {
               {availableTypes.length > 0 && (
                 <button
                   onClick={() => { setView('create'); setSelectedTransactionType(null); }}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${view === 'create' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${view === 'create' ? 'bg-white text-mambu-green shadow-sm' : 'text-slate-600 hover:text-mambu-dark'
                     } `}
                 >
                   <PlusCircle size={16} />
@@ -88,7 +88,7 @@ function App() {
               {canApprove && (
                 <button
                   onClick={() => setView('approval')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${view === 'approval' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${view === 'approval' ? 'bg-white text-mambu-green shadow-sm' : 'text-slate-600 hover:text-mambu-dark'
                     } `}
                 >
                   <LayoutDashboard size={16} />
@@ -100,7 +100,7 @@ function App() {
             {/* User Profile */}
             <div className="flex items-center gap-3 pl-6 border-l border-slate-200">
               <div className="text-right hidden md:block">
-                <div className="text-sm font-bold text-slate-800">{user.username}</div>
+                <div className="text-sm font-bold text-mambu-dark">{user.username}</div>
                 <div className="text-xs text-slate-500 truncate max-w-[150px]" title={roleNames}>{roleNames}</div>
               </div>
               <div className="bg-slate-100 p-2 rounded-full">
@@ -132,7 +132,7 @@ function App() {
               <div>
                 <button
                   onClick={() => setSelectedTransactionType(null)}
-                  className="mb-4 text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-1"
+                  className="mb-4 text-sm text-slate-500 hover:text-mambu-green flex items-center gap-1"
                 >
                   ← Back to Transaction Types
                 </button>

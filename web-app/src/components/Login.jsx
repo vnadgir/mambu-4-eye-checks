@@ -1,132 +1,172 @@
 import React, { useState } from 'react';
-import { LogIn, Users } from 'lucide-react';
 import { authenticateUser, getAllTestUsers } from '../services/userService';
-import { ROLES } from '../config/roleConfig';
+import { Shield, User, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import Notification from './Notification';
 
 const Login = ({ onLogin }) => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [showTestUsers, setShowTestUsers] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [notification, setNotification] = useState(null);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const user = authenticateUser(username, password);
+        setError('');
+        setIsLoading(true);
+        setNotification(null);
 
-        if (user) {
-            onLogin(user);
-        } else {
-            setError('Invalid username or password');
+        // Simulate network delay for better UX feel
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        try {
+            const user = authenticateUser(email, password);
+            if (user) {
+                setNotification({ type: 'success', message: 'Login successful', details: `Welcome back, ${user.username}!` });
+                setTimeout(() => onLogin(user), 800);
+            } else {
+                setNotification({ type: 'error', message: 'Login failed', details: 'Invalid email or password. Please try again.' });
+                setIsLoading(false);
+            }
+        } catch (err) {
+            setNotification({ type: 'error', message: 'System Error', details: 'An unexpected error occurred. Please try again later.' });
+            setIsLoading(false);
         }
     };
 
-    const handleQuickLogin = (email) => {
-        const user = authenticateUser(email, 'mambu');
-        if (user) {
-            onLogin(user);
-        }
+    const handleQuickLogin = (testEmail) => {
+        setEmail(testEmail);
+        setPassword('mambu'); // Auto-fill default password
     };
 
     const testUsers = getAllTestUsers();
-    const groupedUsers = {
-        'Deposit Department': testUsers.filter(u => u.roles.some(r => r.includes('DEPOSIT'))),
-        'Accounting Department': testUsers.filter(u => u.roles.some(r => r.includes('ACCOUNT') || r.includes('JOURNAL'))),
-        'Treasury Department': testUsers.filter(u => u.roles.some(r => r.includes('PAYMENT') || r.includes('TREASURY'))),
-        'Management': testUsers.filter(u => u.roles.some(r => ['SENIOR_MANAGER', 'FINANCE_DIRECTOR', 'CFO'].includes(r))),
-        'Other': testUsers.filter(u => u.roles.includes('ADMIN') || u.email === 'multi-role@test.com')
-    };
+
+    // Group users by department for better display
+    const usersByDept = Object.values(testUsers).reduce((acc, user) => {
+        const dept = user.roles[0].split('_')[0]; // Rough grouping
+        if (!acc[dept]) acc[dept] = [];
+        acc[dept].push(user);
+        return acc;
+    }, {});
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-slate-100">
-                <div className="flex justify-center mb-6">
-                    <div className="bg-indigo-100 p-3 rounded-full">
-                        <LogIn className="text-indigo-600" size={32} />
+        <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            {notification && (
+                <Notification
+                    type={notification.type}
+                    message={notification.message}
+                    details={notification.details}
+                    onClose={() => setNotification(null)}
+                />
+            )}
+
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <div className="flex justify-center">
+                    <div className="bg-mambu-green p-3 rounded-xl shadow-lg">
+                        <Shield className="text-white h-10 w-10" />
                     </div>
                 </div>
-                <h2 className="text-2xl font-bold text-center text-slate-800 mb-2">Sign In to Mambu Ops</h2>
-                <p className="text-center text-slate-500 text-sm mb-6">Multi-stage workflow system</p>
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
+                    Mambu 4-Eyes Check
+                </h2>
+                <p className="mt-2 text-center text-sm text-slate-600">
+                    Secure Transaction Approval System
+                </p>
+            </div>
 
-                {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm text-center">
-                        {error}
-                    </div>
-                )}
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-slate-100">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+                                Email address
+                            </label>
+                            <div className="mt-1 relative rounded-md shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <User className="h-5 w-5 text-slate-400" />
+                                </div>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="focus:ring-mambu-green focus:border-mambu-green block w-full pl-10 sm:text-sm border-slate-300 rounded-md py-2"
+                                    placeholder="you@mambu.com"
+                                />
+                            </div>
+                        </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Username / Email</label>
-                        <input
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                            placeholder="e.g. maker1@test.com"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                            placeholder="mambu"
-                            required
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md"
-                    >
-                        Sign In
-                    </button>
-                </form>
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                                Password
+                            </label>
+                            <div className="mt-1 relative rounded-md shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Lock className="h-5 w-5 text-slate-400" />
+                                </div>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="focus:ring-mambu-green focus:border-mambu-green block w-full pl-10 sm:text-sm border-slate-300 rounded-md py-2"
+                                    placeholder="••••••••"
+                                />
+                            </div>
+                        </div>
 
-                <div className="border-t border-slate-200 pt-4">
-                    <button
-                        onClick={() => setShowTestUsers(!showTestUsers)}
-                        className="w-full flex items-center justify-center gap-2 text-slate-600 hover:text-indigo-600 text-sm font-medium transition-colors"
-                    >
-                        <Users size={16} />
-                        {showTestUsers ? 'Hide' : 'Show'} Test Users
-                    </button>
+                        <div>
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-mambu-green hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mambu-green disabled:opacity-70 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                                        Signing in...
+                                    </>
+                                ) : (
+                                    'Sign in'
+                                )}
+                            </button>
+                        </div>
+                    </form>
 
-                    {showTestUsers && (
-                        <div className="mt-4 max-h-96 overflow-y-auto space-y-3">
-                            {Object.entries(groupedUsers).map(([dept, users]) => (
-                                users.length > 0 && (
-                                    <div key={dept}>
-                                        <h3 className="text-xs font-semibold text-slate-500 uppercase mb-2">{dept}</h3>
-                                        <div className="space-y-1">
-                                            {users.map(user => (
-                                                <button
-                                                    key={user.email}
-                                                    onClick={() => handleQuickLogin(user.email)}
-                                                    className="w-full text-left p-2 rounded-lg hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition-colors"
-                                                >
-                                                    <div className="font-medium text-sm text-slate-800">{user.username}</div>
-                                                    <div className="text-xs text-slate-500">{user.email}</div>
-                                                    <div className="flex flex-wrap gap-1 mt-1">
-                                                        {user.roles.map(role => (
-                                                            <span key={role} className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-                                                                {ROLES[role]?.name || role}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
+                    <div className="mt-6">
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-slate-300" />
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-slate-500">
+                                    Quick Login (Test Users)
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                            {Object.entries(testUsers).map(([email, user]) => (
+                                <button
+                                    key={email}
+                                    onClick={() => handleQuickLogin(email)}
+                                    className="w-full flex items-center justify-between px-4 py-2 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mambu-green text-left group"
+                                >
+                                    <div className="flex flex-col items-start overflow-hidden">
+                                        <span className="font-medium truncate w-full">{user.username}</span>
+                                        <span className="text-xs text-slate-500 truncate w-full">{user.roles.join(', ')}</span>
                                     </div>
-                                )
+                                    <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-mambu-green opacity-0 group-hover:opacity-100 transition-all" />
+                                </button>
                             ))}
                         </div>
-                    )}
-                </div>
-
-                <div className="mt-6 text-center text-xs text-slate-400">
-                    All test users have password: <span className="font-mono">mambu</span>
+                    </div>
                 </div>
             </div>
         </div>
