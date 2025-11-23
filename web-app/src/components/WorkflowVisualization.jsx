@@ -24,12 +24,11 @@ const WorkflowVisualization = ({ transaction }) => {
                     // Determine icon and color
                     let Icon = Circle;
                     let colorClass = 'text-slate-300 bg-white border-slate-300';
-                    let lineColor = 'bg-slate-200';
 
                     if (stageStatus === 'COMPLETED') {
                         Icon = CheckCircle;
                         colorClass = 'text-green-600 bg-white border-green-600';
-                        lineColor = 'bg-green-600';
+                        colorClass = 'text-green-600 bg-white border-green-600';
                     } else if (stageStatus === 'CURRENT') {
                         Icon = Clock;
                         colorClass = 'text-indigo-600 bg-white border-indigo-600';

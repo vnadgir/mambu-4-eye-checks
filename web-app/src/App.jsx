@@ -7,7 +7,7 @@ import LoanDisbursementForm from './components/LoanDisbursementForm';
 import ApprovalDashboard from './components/ApprovalDashboard';
 import TransactionTypeSelector from './components/TransactionTypeSelector';
 import { LogOut, Shield, User, LayoutDashboard, PlusCircle } from 'lucide-react';
-import { getAvailableTransactionTypes, canApproveTransactionType, getUserSeniorityLevel, isAdmin } from './services/permissionService';
+import { getAvailableTransactionTypes, canApproveTransactionType } from './services/permissionService';
 import { ROLES } from './config/roleConfig';
 
 import { sessionService } from './services/sessionService';

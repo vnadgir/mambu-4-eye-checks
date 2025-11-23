@@ -6,13 +6,11 @@ import Notification from './Notification';
 const Login = ({ onLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [notification, setNotification] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         setIsLoading(true);
         setNotification(null);
 
@@ -28,7 +26,7 @@ const Login = ({ onLogin }) => {
                 setNotification({ type: 'error', message: 'Login failed', details: 'Invalid email or password. Please try again.' });
                 setIsLoading(false);
             }
-        } catch (err) {
+        } catch {
             setNotification({ type: 'error', message: 'System Error', details: 'An unexpected error occurred. Please try again later.' });
             setIsLoading(false);
         }
@@ -41,13 +39,8 @@ const Login = ({ onLogin }) => {
 
     const testUsers = getAllTestUsers();
 
-    // Group users by department for better display
-    const usersByDept = Object.values(testUsers).reduce((acc, user) => {
-        const dept = user.roles[0].split('_')[0]; // Rough grouping
-        if (!acc[dept]) acc[dept] = [];
-        acc[dept].push(user);
-        return acc;
-    }, {});
+    // Group users by department for better display (Logic removed as unused)
+    // const usersByDept = ... (removed)
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
