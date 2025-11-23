@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createTransaction } from '../services/mambuApi';
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import { TRANSACTION_TYPES } from '../config/workflowConfig';
 import Notification from './Notification';
 
@@ -53,6 +53,7 @@ const JournalEntryForm = ({ user }) => {
     };
 
     const { debitTotal, creditTotal, balanced } = calculateTotals();
+    const isFormValid = formData.date && formData.notes && balanced && formData.entries.every(e => e.account && e.amount);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -155,44 +156,107 @@ const JournalEntryForm = ({ user }) => {
                             <Plus size={16} /> Add Line
                         </button>
                     </div>
-                </div>
-            </td>
-            <td colSpan="2" className="px-4 py-2">
-                {isBalanced ? (
-                    <span className="text-green-600 flex items-center gap-1 text-xs">
-                        <CheckCircle size={14} /> Balanced
-                    </span>
-                ) : (
-                    <span className="text-red-600 flex items-center gap-1 text-xs">
-                        <AlertCircle size={14} /> Unbalanced ({Math.abs(debitTotal - creditTotal).toFixed(2)})
-                    </span>
-                )}
-            </td>
-        </tr>
-                            </tfoot >
-                        </table >
-                    </div >
-                </div >
 
-    <button
-        type="submit"
-        disabled={!isFormValid || submitting}
-        className={`w-full py-2.5 px-4 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all ${!isFormValid || submitting
-            ? 'bg-slate-300 cursor-not-allowed'
-            : 'bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg'
-            }`}
-    >
-        {submitting ? (
-            <>
-                <Loader2 className="animate-spin" size={18} />
-                Submitting...
-            </>
-        ) : (
-            'Submit Journal Entry'
-        )}
-    </button>
-            </form >
-        </div >
+                    <div className="border border-slate-200 rounded-lg overflow-hidden">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-200">
+                                <tr>
+                                    <th className="px-4 py-2 w-24">Type</th>
+                                    <th className="px-4 py-2">Account ID</th>
+                                    <th className="px-4 py-2 w-32">Amount</th>
+                                    <th className="px-4 py-2 w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {formData.entries.map((entry, index) => (
+                                    <tr key={index}>
+                                        <td className="px-4 py-2">
+                                            <select
+                                                value={entry.type}
+                                                onChange={(e) => handleEntryChange(index, 'type', e.target.value)}
+                                                className="w-full bg-transparent outline-none font-medium text-slate-700"
+                                            >
+                                                <option value="DEBIT">Debit</option>
+                                                <option value="CREDIT">Credit</option>
+                                            </select>
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            <input
+                                                type="text"
+                                                value={entry.account}
+                                                onChange={(e) => handleEntryChange(index, 'account', e.target.value)}
+                                                className="w-full bg-transparent outline-none placeholder-slate-400"
+                                                placeholder="GL Account ID"
+                                                required
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            <input
+                                                type="number"
+                                                value={entry.amount}
+                                                onChange={(e) => handleEntryChange(index, 'amount', e.target.value)}
+                                                step="0.01"
+                                                className="w-full bg-transparent outline-none placeholder-slate-400 text-right"
+                                                placeholder="0.00"
+                                                required
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2 text-center">
+                                            {formData.entries.length > 2 && (
+                                                <button type="button" onClick={() => removeEntry(index)} className="text-slate-400 hover:text-red-500">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot className="bg-slate-50 border-t border-slate-200 font-medium text-slate-700">
+                                <tr>
+                                    <td colSpan="2" className="px-4 py-2 text-right">Totals:</td>
+                                    <td className="px-4 py-2 text-right">
+                                        <div className="text-xs text-slate-500">DR: {debitTotal.toFixed(2)}</div>
+                                        <div className="text-xs text-slate-500">CR: {creditTotal.toFixed(2)}</div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colSpan="4" className="px-4 py-2 border-t border-slate-200 bg-white">
+                                        {balanced ? (
+                                            <span className="text-green-600 flex items-center justify-end gap-1 text-xs">
+                                                <CheckCircle size={14} /> Balanced
+                                            </span>
+                                        ) : (
+                                            <span className="text-red-600 flex items-center justify-end gap-1 text-xs">
+                                                <AlertCircle size={14} /> Unbalanced ({Math.abs(debitTotal - creditTotal).toFixed(2)})
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={!isFormValid || submitting}
+                    className={`w-full py-2.5 px-4 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all ${!isFormValid || submitting
+                        ? 'bg-slate-300 cursor-not-allowed'
+                        : 'bg-mambu-green hover:bg-green-600 shadow-md hover:shadow-lg'
+                        }`}
+                >
+                    {submitting ? (
+                        <>
+                            <Loader2 className="animate-spin" size={18} />
+                            Submitting...
+                        </>
+                    ) : (
+                        'Submit Journal Entry'
+                    )}
+                </button>
+            </form>
+        </div>
     );
 };
 

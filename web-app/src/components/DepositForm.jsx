@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getTransactionChannels, createTransaction } from '../services/mambuApi';
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, DollarSign } from 'lucide-react';
 import { TRANSACTION_TYPES } from '../config/workflowConfig';
+import Notification from './Notification';
 
 const DepositForm = ({ user }) => {
     const [channels, setChannels] = useState([]);
@@ -12,8 +13,27 @@ const DepositForm = ({ user }) => {
     const [formData, setFormData] = useState({
         accountId: '',
         amount: '',
+        transactionChannelId: '',
         notes: ''
     });
+
+    useEffect(() => {
+        const fetchChannels = async () => {
+            try {
+                const data = await getTransactionChannels();
+                setChannels(data);
+                if (data.length > 0) {
+                    setFormData(prev => ({ ...prev, transactionChannelId: data[0].id }));
+                }
+            } catch (error) {
+                console.error("Failed to load channels", error);
+                setNotification({ type: 'error', message: 'Failed to load transaction channels', details: error.message });
+            } finally {
+                setLoadingChannels(false);
+            }
+        };
+        fetchChannels();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -28,8 +48,7 @@ const DepositForm = ({ user }) => {
         try {
             const depositData = {
                 ...formData,
-                amount: parseFloat(formData.amount),
-                transactionChannelId: '8a8e867271bd280c0171bf7e400c1111' // Mock channel ID
+                amount: parseFloat(formData.amount)
             };
 
             const result = await createTransaction(TRANSACTION_TYPES.DEPOSIT, depositData, user);
@@ -44,6 +63,7 @@ const DepositForm = ({ user }) => {
             setFormData({
                 accountId: '',
                 amount: '',
+                transactionChannelId: channels.length > 0 ? channels[0].id : '',
                 notes: ''
             });
         } catch (error) {
@@ -58,7 +78,7 @@ const DepositForm = ({ user }) => {
         }
     };
 
-    const isFormValid = formData.accountId && formData.amount;
+    const isFormValid = formData.accountId && formData.amount && formData.transactionChannelId;
 
     return (
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-8 border border-slate-100">
@@ -108,17 +128,28 @@ const DepositForm = ({ user }) => {
                 </div>
 
                 <div>
-                    {channel.name}
-                </option>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Transaction Channel</label>
+                    <div className="relative">
+                        <select
+                            name="transactionChannelId"
+                            value={formData.transactionChannelId}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-mambu-green outline-none appearance-none bg-white"
+                            required
+                        >
+                            {channels.map(channel => (
+                                <option key={channel.id} value={channel.id}>
+                                    {channel.name}
+                                </option>
                             ))}
-            </select>
-            {loadingChannels && (
-                <div className="absolute right-3 top-2.5">
-                    <Loader2 className="animate-spin text-slate-400" size={16} />
+                        </select>
+                        {loadingChannels && (
+                            <div className="absolute right-3 top-2.5">
+                                <Loader2 className="animate-spin text-slate-400" size={16} />
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
-        </div>
-                </div >
 
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Notes</label>
@@ -127,7 +158,7 @@ const DepositForm = ({ user }) => {
                         value={formData.notes}
                         onChange={handleChange}
                         rows="3"
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-mambu-green outline-none resize-none"
                         placeholder="Optional notes..."
                     ></textarea>
                 </div>
@@ -137,20 +168,20 @@ const DepositForm = ({ user }) => {
                     disabled={!isFormValid || submitting}
                     className={`w-full py-2.5 px-4 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all ${!isFormValid || submitting
                         ? 'bg-slate-300 cursor-not-allowed'
-                        : 'bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg'
+                        : 'bg-mambu-green hover:bg-green-600 shadow-md hover:shadow-lg'
                         }`}
                 >
                     {submitting ? (
                         <>
                             <Loader2 className="animate-spin" size={18} />
-                            Submitting...
+                            Processing...
                         </>
                     ) : (
                         'Submit for Approval'
                     )}
                 </button>
-            </form >
-        </div >
+            </form>
+        </div>
     );
 };
 

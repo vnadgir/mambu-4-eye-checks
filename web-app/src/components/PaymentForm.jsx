@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { createTransaction } from '../services/mambuApi';
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, CreditCard } from 'lucide-react';
 import { TRANSACTION_TYPES } from '../config/workflowConfig';
+import Notification from './Notification';
 
 const PaymentForm = ({ user }) => {
     const [submitting, setSubmitting] = useState(false);
     const [notification, setNotification] = useState(null);
 
     const [formData, setFormData] = useState({
-        beneficiaryName: '',
-        beneficiaryAccount: '',
+        beneficiary: '',
+        iban: '',
         amount: '',
-        paymentDate: new Date().toISOString().split('T')[0],
-        paymentType: 'WIRE',
+        reference: '',
         notes: ''
     });
 
@@ -36,115 +36,101 @@ const PaymentForm = ({ user }) => {
 
             setNotification({
                 type: 'success',
-                message: `${result.message} ID: ${result.transactionId}`,
-                details: result.workflow ? `Workflow: ${result.workflow}` : null
+                message: 'Payment Initiated',
+                details: `${result.message} ID: ${result.transactionId}. Workflow: ${result.workflow || 'None'}`
             });
 
             // Reset form
             setFormData({
-                beneficiaryName: '',
-                beneficiaryAccount: '',
+                beneficiary: '',
+                iban: '',
                 amount: '',
-                paymentDate: new Date().toISOString().split('T')[0],
-                paymentType: 'WIRE',
+                reference: '',
                 notes: ''
             });
         } catch (error) {
-            setNotification({ type: 'error', message: 'Failed to submit payment.' });
+            setNotification({
+                type: 'error',
+                message: 'Payment Failed',
+                details: error.message || 'An unexpected error occurred.'
+            });
         } finally {
             setSubmitting(false);
         }
     };
 
-    const isFormValid = formData.beneficiaryName && formData.beneficiaryAccount && formData.amount && formData.paymentDate;
+    const isFormValid = formData.beneficiary && formData.iban && formData.amount;
 
     return (
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-8 border border-slate-100">
-            <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-800">New Outgoing Payment</h2>
-                <p className="text-slate-500 text-sm mt-1">Initiate a payment to an external beneficiary.</p>
-            </div>
-
             {notification && (
-                <div className={`p-4 mb-6 rounded-lg flex items-start gap-3 ${notification.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                    {notification.type === 'success' ? <CheckCircle size={20} className="mt-0.5" /> : <AlertCircle size={20} className="mt-0.5" />}
-                    <div>
-                        <div className="text-sm font-medium">{notification.message}</div>
-                        {notification.details && <div className="text-xs mt-1 opacity-80">{notification.details}</div>}
-                    </div>
-                </div>
+                <Notification
+                    type={notification.type}
+                    message={notification.message}
+                    details={notification.details}
+                    onClose={() => setNotification(null)}
+                />
             )}
+
+            <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-800">Outgoing Payment</h2>
+                <p className="text-slate-500 text-sm mt-1">Initiate a wire transfer or bill payment.</p>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Beneficiary Name</label>
                     <input
                         type="text"
-                        name="beneficiaryName"
-                        value={formData.beneficiaryName}
+                        name="beneficiary"
+                        value={formData.beneficiary}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                        placeholder="e.g. Vendor Corp Ltd."
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-mambu-green outline-none"
+                        placeholder="e.g. Acme Corp"
                         required
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Beneficiary Account / IBAN</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">IBAN / Account Number</label>
                     <input
                         type="text"
-                        name="beneficiaryAccount"
-                        value={formData.beneficiaryAccount}
+                        name="iban"
+                        value={formData.iban}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                        placeholder="e.g. US123456789"
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-mambu-green outline-none"
+                        placeholder="DE89 3704 0044 0532 0130 00"
                         required
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Amount</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2 text-slate-400">$</span>
-                            <input
-                                type="number"
-                                name="amount"
-                                value={formData.amount}
-                                onChange={handleChange}
-                                step="0.01"
-                                className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                placeholder="0.00"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Payment Date</label>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Amount</label>
+                    <div className="relative">
+                        <span className="absolute left-3 top-2 text-slate-400"><CreditCard size={18} /></span>
                         <input
-                            type="date"
-                            name="paymentDate"
-                            value={formData.paymentDate}
+                            type="number"
+                            name="amount"
+                            value={formData.amount}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            step="0.01"
+                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-mambu-green outline-none"
+                            placeholder="0.00"
                             required
                         />
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Payment Type</label>
-                    <select
-                        name="paymentType"
-                        value={formData.paymentType}
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Reference</label>
+                    <input
+                        type="text"
+                        name="reference"
+                        value={formData.reference}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
-                    >
-                        <option value="WIRE">Wire Transfer</option>
-                        <option value="ACH">ACH</option>
-                        <option value="CHECK">Check</option>
-                        <option value="INTERNAL">Internal Transfer</option>
-                    </select>
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-mambu-green outline-none"
+                        placeholder="Invoice #12345"
+                    />
                 </div>
 
                 <div>
@@ -164,13 +150,13 @@ const PaymentForm = ({ user }) => {
                     disabled={!isFormValid || submitting}
                     className={`w-full py-2.5 px-4 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all ${!isFormValid || submitting
                         ? 'bg-slate-300 cursor-not-allowed'
-                        : 'bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg'
+                        : 'bg-mambu-green hover:bg-green-600 shadow-md hover:shadow-lg'
                         }`}
                 >
                     {submitting ? (
                         <>
                             <Loader2 className="animate-spin" size={18} />
-                            Submitting...
+                            Processing...
                         </>
                     ) : (
                         'Submit Payment'
