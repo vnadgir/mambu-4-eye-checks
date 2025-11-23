@@ -147,8 +147,8 @@ const Login = ({ onLogin }) => {
                         <div className="mt-6 grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                             {Object.entries(testUsers).map(([email, user]) => (
                                 <button
-                                    key={email}
-                                    onClick={() => handleQuickLogin(email)}
+                                    key={user.email}
+                                    onClick={() => handleQuickLogin(user.email)}
                                     className="w-full flex items-center justify-between px-4 py-2 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mambu-green text-left group"
                                 >
                                     <div className="flex flex-col items-start overflow-hidden">
