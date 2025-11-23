@@ -1,5 +1,5 @@
-import { determineWorkflow } from './workflowEngine';
-import { sessionService } from './sessionService';
+import { determineWorkflow } from './workflowEngine.js';
+import { sessionService } from './sessionService.js';
 
 const DB_KEY = 'mambu_transactions';
 
@@ -65,7 +65,37 @@ export const saveTransaction = (transactionType, transactionData, createdBy) => 
     return newTransaction;
 };
 
-// ... (getTransactionById, updateTransaction, updateTransactionStatus remain same) ...
+export const getTransactionById = (id) => {
+    const transactions = getTransactions();
+    return transactions.find(t => t.id === id);
+};
+
+export const updateTransaction = (id, updatedData) => {
+    const transactions = getTransactions();
+    const index = transactions.findIndex(t => t.id === id);
+    if (index !== -1) {
+        transactions[index] = { ...transactions[index], ...updatedData };
+        localStorage.setItem(DB_KEY, JSON.stringify(transactions));
+        return transactions[index];
+    }
+    return null;
+};
+
+export const updateTransactionStatus = (id, status, mambuResponse = null) => {
+    const transaction = getTransactionById(id);
+    if (transaction) {
+        transaction.status = status;
+        if (mambuResponse) {
+            transaction.mambuResponse = mambuResponse;
+        }
+        return updateTransaction(id, transaction);
+    }
+    return null;
+};
+
+export const getPendingTransactions = () => {
+    return getTransactions().filter(t => t.status && t.status.startsWith('PENDING'));
+};
 
 export const getPendingTransactionsForUser = () => {
     const user = sessionService.getCurrentUser();

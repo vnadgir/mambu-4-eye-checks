@@ -1,5 +1,5 @@
-import { ROLES } from '../config/roleConfig';
-import { workflowConfig } from '../config/workflowConfig';
+import { ROLES } from '../config/roleConfig.js';
+import { workflowConfig } from '../config/workflowConfig.js';
 
 /**
  * Gets all roles for a user

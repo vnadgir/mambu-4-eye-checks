@@ -1,4 +1,5 @@
-import { workflowConfig, TRANSACTION_TYPES } from '../config/workflowConfig';
+import { workflowConfig, WORKFLOW_STAGES } from '../config/workflowConfig.js';
+import { canApproveTransactionType } from './permissionService.js';
 
 /**
  * Determines the appropriate workflow for a transaction based on its type and data

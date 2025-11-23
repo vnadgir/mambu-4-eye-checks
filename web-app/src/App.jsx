@@ -30,6 +30,11 @@ function App() {
       setView('approval');
     } else if (canCreate) {
       setView('create');
+      // Auto-select if only one type available
+      const types = getAvailableTransactionTypes(loggedInUser);
+      if (types.length === 1) {
+        setSelectedTransactionType(types[0]);
+      }
     } else {
       setView('dashboard');
     }

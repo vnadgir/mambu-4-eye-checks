@@ -1,6 +1,6 @@
-import { saveTransaction, updateTransaction, getTransactionById } from './mockDatabase';
-import { processApproval } from './workflowEngine';
-import { sessionService } from './sessionService';
+import { saveTransaction, updateTransaction, getTransactionById } from './mockDatabase.js';
+import { processApproval } from './workflowEngine.js';
+import { sessionService } from './sessionService.js';
 
 // Mock data for Transaction Channels
 const MOCK_CHANNELS = [

@@ -180,5 +180,43 @@ export const workflowConfig = {
                 ]
             }
         ]
+    },
+
+    [TRANSACTION_TYPES.LOAN_DISBURSEMENT]: {
+        name: 'Loan Disbursement',
+        description: 'Disburse funds for approved loans',
+        makerRoles: ['LOAN_OFFICER'],
+        workflows: [
+            {
+                name: 'Standard Disbursement',
+                condition: (data) => data.amount < 25000,
+                steps: [
+                    {
+                        stage: WORKFLOW_STAGES.MANAGER_APPROVAL,
+                        roles: ['LOAN_MANAGER'],
+                        required: 1,
+                        description: 'Loan Manager Approval'
+                    }
+                ]
+            },
+            {
+                name: 'Large Disbursement',
+                condition: (data) => data.amount >= 25000,
+                steps: [
+                    {
+                        stage: WORKFLOW_STAGES.MANAGER_APPROVAL,
+                        roles: ['LOAN_MANAGER'],
+                        required: 1,
+                        description: 'Loan Manager Approval'
+                    },
+                    {
+                        stage: WORKFLOW_STAGES.RISK_APPROVAL,
+                        roles: ['RISK_MANAGER'],
+                        required: 1,
+                        description: 'Risk Manager Approval'
+                    }
+                ]
+            }
+        ]
     }
 };
