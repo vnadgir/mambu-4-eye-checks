@@ -27,5 +27,28 @@ export const workflowService = {
         updateTransaction(transactionId, updatedTransaction);
 
         return updatedTransaction;
+    },
+
+    /**
+     * Process a rejection decision for a transaction and persist to database
+     * @param {string} transactionId - ID of the transaction
+     * @param {object} user - User making the decision
+     * @param {string} comments - Optional comments
+     * @returns {object} Updated transaction
+     */
+    rejectTransaction: (transactionId, user, comments = '') => {
+        const transaction = getTransactionById(transactionId);
+
+        if (!transaction) {
+            throw new Error(`Transaction not found: ${transactionId}`);
+        }
+
+        // Process the rejection in memory
+        const updatedTransaction = processApproval(transaction, user, 'REJECT', comments);
+
+        // Persist the changes to the database
+        updateTransaction(transactionId, updatedTransaction);
+
+        return updatedTransaction;
     }
 };

@@ -48,7 +48,11 @@ const ApprovalDashboard = ({ user }) => {
         await new Promise(resolve => setTimeout(resolve, 800));
 
         try {
-            await workflowService.approveTransaction(transaction.id, user, decision, `Manual ${decision.toLowerCase()} via dashboard`);
+            if (decision === 'REJECT') {
+                await workflowService.rejectTransaction(transaction.id, user, `Manual rejection via dashboard`);
+            } else {
+                await workflowService.approveTransaction(transaction.id, user, decision, `Manual approval via dashboard`);
+            }
 
             setNotification({
                 type: 'success',

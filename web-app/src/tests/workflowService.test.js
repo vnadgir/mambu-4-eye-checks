@@ -62,7 +62,7 @@ describe('workflowService', () => {
 
         const txn = saveTransaction('JOURNAL_ENTRY', { amount: 1000 }, maker.email);
 
-        const updatedTxn = workflowService.approveTransaction(txn.id, checker, 'REJECT', 'Rejected via test');
+        const updatedTxn = workflowService.rejectTransaction(txn.id, checker, 'Rejected via test');
 
         expect(updatedTxn.status).toBe('REJECTED');
 
