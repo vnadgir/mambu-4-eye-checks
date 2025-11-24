@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getPendingTransactionsForUser } from '../services/mockDatabase';
-import { processApproval } from '../services/workflowEngine';
+import { workflowService } from '../services/workflowService';
 import { CheckCircle, XCircle, Clock, DollarSign, FileText, CreditCard, Briefcase, AlertCircle } from 'lucide-react';
 import WorkflowVisualization from './WorkflowVisualization';
 import Notification from './Notification';
@@ -48,7 +48,7 @@ const ApprovalDashboard = ({ user }) => {
         await new Promise(resolve => setTimeout(resolve, 800));
 
         try {
-            processApproval(transaction, user, decision, `Manual ${decision.toLowerCase()} via dashboard`);
+            await workflowService.approveTransaction(transaction.id, user, decision, `Manual ${decision.toLowerCase()} via dashboard`);
 
             setNotification({
                 type: 'success',
